@@ -3,8 +3,8 @@ package db
 import (
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
-	"opsHeart/conf"
-	"opsHeart/logger"
+	"opsHeart_server/conf"
+	"opsHeart_server/logger"
 )
 
 var DB *gorm.DB

@@ -3,9 +3,9 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"opsHeart/common"
-	"opsHeart/logger"
-	"opsHeart/service/agent"
+	"opsHeart_server/common"
+	"opsHeart_server/logger"
+	"opsHeart_server/service/agent"
 )
 
 func HandleHbs(c *gin.Context) {

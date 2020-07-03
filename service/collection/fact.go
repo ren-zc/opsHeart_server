@@ -1,6 +1,6 @@
 package collection
 
-import "opsHeart/db"
+import "opsHeart_server/db"
 
 func (af *AgentFact) IsExist() bool {
 	var t AgentFact

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	rotatelogs "github.com/lestrrat-go/file-rotatelogs"
 	log "github.com/sirupsen/logrus"
-	cc "opsHeart/conf"
+	cc "opsHeart_server/conf"
 	"os"
 	"strings"
 )

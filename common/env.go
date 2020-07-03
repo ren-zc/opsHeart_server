@@ -1,6 +1,6 @@
 package common
 
-import "opsHeart/conf"
+import "opsHeart_server/conf"
 
 var AgentPort string
 

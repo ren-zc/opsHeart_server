@@ -1,6 +1,6 @@
 package task
 
-import "opsHeart/db"
+import "opsHeart_server/db"
 
 func (s *TaskScript) QueryByTaskID() (err error) {
 	err = db.DB.Model(s).Where("task_id = ?", s.TaskID).First(s).Error

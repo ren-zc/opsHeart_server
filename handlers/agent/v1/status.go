@@ -3,10 +3,10 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"opsHeart/common"
-	"opsHeart/db"
-	"opsHeart/logger"
-	"opsHeart/service/agent"
+	"opsHeart_server/common"
+	"opsHeart_server/db"
+	"opsHeart_server/logger"
+	"opsHeart_server/service/agent"
 )
 
 func HandleStatus(c *gin.Context) {

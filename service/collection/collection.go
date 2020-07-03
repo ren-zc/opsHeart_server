@@ -1,6 +1,6 @@
 package collection
 
-import "opsHeart/db"
+import "opsHeart_server/db"
 
 func (ac *AgentCollection) GetAllIPs() ([]string, error) {
 	return nil, nil

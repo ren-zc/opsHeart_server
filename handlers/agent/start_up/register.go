@@ -3,8 +3,8 @@ package start_up
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"opsHeart/logger"
-	"opsHeart/service/agent"
+	"opsHeart_server/logger"
+	"opsHeart_server/service/agent"
 )
 
 // HandleAgentRegister used for agent register self to server

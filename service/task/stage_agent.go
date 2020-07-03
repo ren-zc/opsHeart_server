@@ -1,6 +1,6 @@
 package task
 
-import "opsHeart/db"
+import "opsHeart_server/db"
 
 func (sa *TaskStageAgent) Update(f string, v interface{}) error {
 	return db.DB.Model(&TaskStageAgent{}).

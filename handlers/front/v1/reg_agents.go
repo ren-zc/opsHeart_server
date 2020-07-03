@@ -3,9 +3,9 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"opsHeart/logger"
-	"opsHeart/service/agent"
-	"opsHeart/utils/rand_str"
+	"opsHeart_server/logger"
+	"opsHeart_server/service/agent"
+	"opsHeart_server/utils/rand_str"
 )
 
 func HandleQueryUnregAgents(c *gin.Context) {

@@ -2,11 +2,11 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"opsHeart/handlers/agent/start_up"
-	agentV1 "opsHeart/handlers/agent/v1"
-	frontV1 "opsHeart/handlers/front/v1"
-	testV1 "opsHeart/handlers/test/v1"
-	"opsHeart/routers/middleware"
+	"opsHeart_server/handlers/agent/start_up"
+	agentV1 "opsHeart_server/handlers/agent/v1"
+	frontV1 "opsHeart_server/handlers/front/v1"
+	testV1 "opsHeart_server/handlers/test/v1"
+	"opsHeart_server/routers/middleware"
 )
 
 var R *gin.Engine

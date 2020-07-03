@@ -1,8 +1,8 @@
 package collection
 
 import (
-	"opsHeart/conf"
-	"opsHeart/db"
+	"opsHeart_server/conf"
+	"opsHeart_server/db"
 	"testing"
 )
 

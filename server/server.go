@@ -2,10 +2,10 @@ package server
 
 import (
 	"fmt"
-	"opsHeart/common"
-	"opsHeart/conf"
-	"opsHeart/logger"
-	"opsHeart/routers"
+	"opsHeart_server/common"
+	"opsHeart_server/conf"
+	"opsHeart_server/logger"
+	"opsHeart_server/routers"
 )
 
 type Data struct {

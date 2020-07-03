@@ -1,9 +1,9 @@
 package task
 
 import (
-	"opsHeart/conf"
-	"opsHeart/db"
-	"opsHeart/utils/rand_str"
+	"opsHeart_server/conf"
+	"opsHeart_server/db"
+	"opsHeart_server/utils/rand_str"
 	"testing"
 )
 

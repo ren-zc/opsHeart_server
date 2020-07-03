@@ -2,9 +2,9 @@ package task
 
 import (
 	"encoding/json"
-	"opsHeart/conf"
-	"opsHeart/db"
-	"opsHeart/utils/rand_str"
+	"opsHeart_server/conf"
+	"opsHeart_server/db"
+	"opsHeart_server/utils/rand_str"
 	"strconv"
 	"testing"
 	"time"
@@ -133,7 +133,7 @@ func TestTask_Run(t *testing.T) {
 
 	// *** ROOT TASK ***
 	tr := Task{
-		Name:            "test task 50",
+		Name:            "test task 56",
 		TkType:          TASKROOT,
 		CollectionType:  CollList,
 		CollectionValue: string(collValByte),

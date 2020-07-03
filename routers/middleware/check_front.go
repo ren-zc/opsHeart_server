@@ -3,8 +3,8 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
-	"opsHeart/common"
-	"opsHeart/conf"
+	"opsHeart_server/common"
+	"opsHeart_server/conf"
 )
 
 func FrontToken() gin.HandlerFunc {

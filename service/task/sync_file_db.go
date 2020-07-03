@@ -1,6 +1,6 @@
 package task
 
-import "opsHeart/db"
+import "opsHeart_server/db"
 
 func (sf *TaskSyncFile) QueryByTaskID() (err error) {
 	err = db.DB.Model(sf).Where("task_id = ?", sf.TaskID).First(sf).Error
