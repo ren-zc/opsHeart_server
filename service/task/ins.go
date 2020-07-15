@@ -355,9 +355,6 @@ func (ins *TaskInstance) StageFinish(t *Task) {
 	// start next stage
 	nextIns, _ := ins.GetNextStageInstance()
 	nextInsL := len(nextIns)
-	if t.ID == 330 {
-		fmt.Println(nextIns)
-	}
 	if nextInsL == 1 {
 		if nextIns[0].Status >= STAGERUNNING {
 			logger.TaskLog.Debugf("*** ins: %d, next ins: %d, next ins is running, return\n",
