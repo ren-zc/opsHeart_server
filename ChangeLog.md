@@ -1,13 +1,18 @@
 opsHeart ChangeLog
 
 ## Standard entrances
++ FEATURES
++ ENHANCEMENTS
++ DEPRECATED
++ ADDED
++ FIXED
++ CHANGED
++ REMOVED
++ OTHERS
+
+## v0.03 (2020-07-16)
 ### FEATURES
-### ADDED
-### FIXED
-### ENHANCEMENTS
-### DEPRECATED
-### REMOVED
-### OTHERS
++ pause between steps when Canary release;
 
 ## v0.02 (2020-07-15)
 ### ADDED

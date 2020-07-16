@@ -362,7 +362,10 @@ func (ins *TaskInstance) StageFinish(t *Task) {
 			return
 		}
 		logger.TaskLog.Debugf("*** ins: %d, next ins: %d\n", ins.ID, nextIns[0].ID)
-		nextIns[0].StartStage(t)
+
+		// stage not auto start and stage need start by human.
+		//nextIns[0].StartStage(t)
+
 		return
 	}
 	if nextInsL > 1 {

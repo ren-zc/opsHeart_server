@@ -1,9 +1,9 @@
 package common
 
 const (
-	Version     = "0.02"
+	Version     = "0.03"
 	Author      = "Jacenr"
-	ReleaseTime = "2020-07-15"
+	ReleaseTime = "2020-07-16"
 )
 
 var (

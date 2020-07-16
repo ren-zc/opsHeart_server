@@ -107,12 +107,13 @@ type TaskSyncFile struct {
 type StageStatus int
 
 const (
-	STAGEREADY   StageStatus = 0
-	STAGERUNNING StageStatus = 1
-	STAGEPAUSED  StageStatus = 2
-	STAGESTOPPED StageStatus = 3
-	STAGEFAILED  StageStatus = 4
-	STAGESUCCESS StageStatus = 5
+	STAGEREADY       StageStatus = -1
+	STAGENEEDCONFIRM StageStatus = 0
+	STAGERUNNING     StageStatus = 1
+	STAGEPAUSED      StageStatus = 2
+	STAGESTOPPED     StageStatus = 3
+	STAGEFAILED      StageStatus = 4
+	STAGESUCCESS     StageStatus = 5
 )
 
 type TaskInstance struct {

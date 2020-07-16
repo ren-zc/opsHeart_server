@@ -45,6 +45,9 @@ func init() {
 
 			// run task
 			v1.POST("/task/run", frontV1.HandleRunTask)
+
+			// run instance
+			v1.POST("/instance/run", frontV1.HandleRunIns)
 		}
 		//col := v1.Group("/collection")
 	}

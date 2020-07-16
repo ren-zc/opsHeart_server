@@ -9,7 +9,7 @@ import (
 )
 
 func HandleRunTask(c *gin.Context) {
-	var tk *task.Task
+	var tk task.Task
 	err := c.ShouldBindJSON(&tk)
 	if err != nil {
 		logger.TaskLog.Errorf("action=handle front run task request;do=bind data;err=%s;err_code=%d",
@@ -44,6 +44,7 @@ func HandleRunTask(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{
-		"status": "success",
+		"err_code": common.NoError,
+		"status":   "success",
 	})
 }
