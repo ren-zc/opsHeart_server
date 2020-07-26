@@ -56,6 +56,16 @@ func (t *Task) GetNextTask() (next []Task, err error) {
 	return
 }
 
+func (t *Task) GetAllTaskArgs() (args []TaskArg, err error) {
+	err = db.DB.Model(t).Related(&args, "TaskArgs").Error
+	return
+}
+
+func (t *Task) GetAllArgsByTaskName() (args []TaskArg, err error) {
+	err = db.DB.Model(&TaskArg{}).Find(&args, "task_name = ?", t.Name).Error
+	return
+}
+
 // CheckNameIsExist check root task name is unique
 // for `root` task, task name must be unique
 func CheckNameIsExist(n string) (ok bool) {

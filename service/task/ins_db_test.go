@@ -7,6 +7,28 @@ import (
 	"time"
 )
 
+func TestInsArg_Create(t *testing.T) {
+	err := conf.InitCfg()
+	if err != nil {
+		t.Fatalf("init conf err: %s", err.Error())
+	}
+	db.InitDB()
+	db.DB.AutoMigrate(&InsArg{})
+
+	ia := InsArg{
+		InsName: "a test ins name 999",
+		TaskID:  99999999,
+		ArgName: "TestArgName999",
+		ArgType: COMMONSTR,
+	}
+
+	err = ia.Create()
+	if err != nil {
+		t.Fatalf("fail: %s", err)
+	}
+	t.Log("success!")
+}
+
 func TestTaskInstance_Create(t *testing.T) {
 	err := conf.InitCfg()
 	if err != nil {

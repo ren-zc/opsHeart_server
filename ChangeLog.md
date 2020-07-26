@@ -10,6 +10,11 @@ opsHeart ChangeLog
 + REMOVED
 + OTHERS
 
+## v0.04 (2020-07-26)
+### FEATURES
++ user can supply variables to basic task;
++ task could be supplied with customized variables when it be called by front or external system;
+
 ## v0.03 (2020-07-16)
 ### FEATURES
 + pause between steps when Canary release;

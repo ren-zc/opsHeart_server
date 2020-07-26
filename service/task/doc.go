@@ -55,3 +55,5 @@ package task
 // When instance run, first check if there is a stage need to run, than check next task.
 // ParentIsX: this is a instance of task whose parent is a a XGROUP task.
 // ContinueOnFail: continue next task even this instance is failed.
+
+// only cmd and script task can have arguments.

@@ -92,8 +92,18 @@ func (ins *TaskInstance) GetAllChildIns() (all []TaskInstance, err error) {
 	return
 }
 
-func GetAllInsByNameAndTaskID(n string, i uint) (allIns []TaskInstance, err error) {
-	err = db.DB.Model(&TaskInstance{}).Where("name = ? and task_id = ?", n, i).
+func (ins *TaskInstance) GetAllArgs() (args []InsArg, err error) {
+	err = db.DB.Model(&InsArg{}).Where("ins_name = ? and task_id = ?", ins.Name, ins.TaskID).
+		Find(&args).Error
+	return
+}
+
+func (ia *InsArg) Create() error {
+	return db.DB.Model(ia).Create(ia).Error
+}
+
+func GetAllInsByNameAndTaskID(name string, i uint) (allIns []TaskInstance, err error) {
+	err = db.DB.Model(&TaskInstance{}).Where("name = ? and task_id = ?", name, i).
 		Find(&allIns).Error
 	return
 }

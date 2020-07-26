@@ -119,6 +119,35 @@ func SplitIPsList(st StType, sNum []int, ips []string) (sam []StageAgentsMap, er
 	return
 }
 
+// init instance arguments
+func (t *Task) InitInsArgs(argMap map[string]TaskArg, insName string) error {
+	args, err := t.GetAllArgsByTaskName()
+	if err != nil {
+		return err
+	}
+	for _, v := range args {
+		insArg := InsArg{
+			InsName:  insName,
+			TaskID:   v.TaskID,
+			ArgName:  v.ArgName,
+			ArgType:  v.ArgType,
+			ArgValue: v.ArgValue,
+		}
+		argV, ok := argMap[v.ArgName]
+		if ok {
+			insArg.ArgType = argV.ArgType
+			insArg.ArgValue = argV.ArgValue
+		}
+
+		// ERROR IGNORED
+		err := insArg.Create()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // Run start a task
 // before Run, should run NewInsName to get a instance name
 func (t *Task) Run(parentIns *TaskInstance) error {

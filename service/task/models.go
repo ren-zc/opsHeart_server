@@ -2,6 +2,7 @@ package task
 
 import (
 	"github.com/jinzhu/gorm"
+	"os"
 	"time"
 )
 
@@ -55,6 +56,25 @@ const (
 	DoNotSplit = 0
 )
 
+// args type
+type ArgsType uint
+
+const (
+	COMMONSTR ArgsType = 0 // common string argument
+	AGENTFACT ArgsType = 1 // a agent fact key which map to a value
+	AGENTTAG  ArgsType = 2 // a agent tag key which map to a value
+	//ROOTARGS  ArgsType = 3 // inherit arguments from task root
+)
+
+type TaskArg struct {
+	gorm.Model
+	TaskID   uint     `json:"task_id" gorm:"index"`
+	TaskName string   `json:"task_name" gorm:"index;UNIQUE_INDEX:task_name_arg"`
+	ArgName  string   `json:"arg_name" gorm:"UNIQUE_INDEX:task_name_arg"`
+	ArgType  ArgsType `json:"arg_type"`
+	ArgValue string   `json:"arg_value"` // default value, it can be reset when start run
+}
+
 type Task struct {
 	gorm.Model
 	Name            string           `json:"name" gorm:"size:100;index"`
@@ -72,6 +92,7 @@ type Task struct {
 	Desc            string           `json:"desc" gorm:"size:500"`
 	Status          Status           `json:"status" gorm:"default:1"`
 	Comments        string           `json:"comments" gorm:"size:500"`
+	TaskArgs        []TaskArg        `json:"task_args"`
 	ContinueOnFail  uint             `json:"continue_on_fail" gorm:"default:0"` // 0: no, 1: yes.
 	ParentXGROUP    uint             `gorm:"-"`                                 // 0: no, 1: yes.
 	ParentVGROUP    uint             `gorm:"-"`                                 // 0: no, 1: yes.
@@ -81,27 +102,33 @@ type Task struct {
 // task type cmd
 type TaskCmd struct {
 	gorm.Model
-	TaskID  uint   `json:"task_id" gorm:"not null;index"`
-	Cmd     string `json:"cmd" gorm:"not null;size:50"`
-	Opt     string `json:"opt" gorm:"size:1000"`
-	Timeout uint   `json:"timeout"`
+	TaskID  uint     `json:"task_id" gorm:"not null;index"`
+	Cmd     string   `json:"cmd" gorm:"not null;size:50"`
+	Opt     string   `json:"opt" gorm:"size:1000"`
+	Timeout uint     `json:"timeout"`
+	Args    []InsArg `gorm:"-"`
 }
 
 // task type script
 type TaskScript struct {
 	gorm.Model
-	TaskID  uint   `json:"task_id" gorm:"not null;index"`
-	Shell   string `json:"shell" gorm:"size:100"`
-	Name    string `json:"name" gorm:"size:100"`
-	RunAs   string `json:"run_as" gorm:"size:50"`
-	Timeout uint   `json:"timeout"`
+	TaskID  uint     `json:"task_id" gorm:"not null;index"`
+	Shell   string   `json:"shell" gorm:"size:100"`
+	Name    string   `json:"name" gorm:"size:100"`
+	RunAs   string   `json:"run_as" gorm:"size:50"`
+	Timeout uint     `json:"timeout"`
+	Args    []InsArg `gorm:"-"`
 }
 
 // task type sync file
 type TaskSyncFile struct {
-	// id, task id (index), f_name, dst, user, group, perm
 	gorm.Model
-	TaskID uint `json:"task_id" gorm:"not null;index"`
+	TaskID uint        `json:"task_id" gorm:"not null;index"`
+	Src    string      `json:"src"`
+	Dst    string      `json:"dst"`
+	User   string      `json:"user"`
+	Group  string      `json:"group"`
+	Perm   os.FileMode `json:"perm"`
 }
 
 type StageStatus int
@@ -136,6 +163,15 @@ type TaskInstance struct {
 	CallbackVGROUP  bool             `gorm:"-"`
 	TaskStageAgents []TaskStageAgent `json:"task_stage_agents" gorm:"foreignkey:stageName;association_foreignkey:stageAgents"`
 	TaskLogs        []TaskLog
+}
+
+type InsArg struct {
+	gorm.Model
+	InsName  string   `json:"ins_name" gorm:"index:ins_task_arg"`
+	TaskID   uint     `json:"task_id" gorm:"index:ins_task_arg"`
+	ArgName  string   `json:"arg_name"`
+	ArgType  ArgsType `json:"arg_type"`
+	ArgValue string   `json:"arg_value"`
 }
 
 type ChildUsed int

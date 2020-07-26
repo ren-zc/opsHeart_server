@@ -33,6 +33,15 @@ func HandleRunTask(c *gin.Context) {
 		Name: insName,
 	}
 
+	// get customized arguments
+	argMap := make(map[string]task.TaskArg)
+	for _, v := range tk.TaskArgs {
+		argMap[v.ArgName] = v
+	}
+
+	// save instance args
+	_ = tkInDb.InitInsArgs(argMap, insName)
+
 	err = tkInDb.Run(&parentIns)
 	if err != nil {
 		logger.TaskLog.Errorf("action=handle front run task;do=run task;err=%s;err_code=%d",

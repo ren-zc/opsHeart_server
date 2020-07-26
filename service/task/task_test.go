@@ -117,6 +117,8 @@ func TestTask_Run(t *testing.T) {
 	db.DB.AutoMigrate(&TaskCmd{})
 	db.DB.AutoMigrate(&TaskScript{})
 	db.DB.AutoMigrate(&TaskStageAgent{})
+	db.DB.AutoMigrate(&TaskArg{})
+	db.DB.AutoMigrate(&InsArg{})
 
 	ipList := make([]string, 0)
 	for i := 0; i < 20; i++ {
@@ -133,7 +135,7 @@ func TestTask_Run(t *testing.T) {
 
 	// *** ROOT TASK ***
 	tr := Task{
-		Name:            "test task 56",
+		Name:            "test task 89",
 		TkType:          TASKROOT,
 		CollectionType:  CollList,
 		CollectionValue: string(collValByte),
@@ -160,22 +162,31 @@ func TestTask_Run(t *testing.T) {
 		Stages:          string(stagesByte),
 		SplitParent:     DoSplit,
 		ContinueOnFail:  1,
+		TaskArgs: []TaskArg{
+			{
+				TaskName: tr.Name,
+				ArgName:  "t1Var1",
+				ArgType:  COMMONSTR,
+				ArgValue: "t1Var1Value",
+			},
+			{
+				TaskName: tr.Name,
+				ArgName:  "t1Var2",
+				ArgType:  AGENTFACT,
+				ArgValue: "t1Var2Value",
+			},
+			{
+				TaskName: tr.Name,
+				ArgName:  "t1Var3",
+				ArgType:  AGENTTAG,
+				ArgValue: "t1Var3Value",
+			},
+		},
 	}
 	err = t1.Create()
 	if err != nil {
 		t.Fatalf("test create t1 err: %s", err.Error())
 	}
-	//s1 := TaskScript{
-	//	TaskID:  t1.ID,
-	//	Shell:   "/bin/t1sh",
-	//	Name:    "/tmp/test123.sh",
-	//	RunAs:   "jacenr",
-	//	Timeout: 60,
-	//}
-	//err = s1.Create()
-	//if err != nil {
-	//	t.Fatalf("test create s1 err: %s", err.Error())
-	//}
 	c1 := TaskCmd{
 		TaskID:  t1.ID,
 		Cmd:     "echo1",
@@ -207,16 +218,6 @@ func TestTask_Run(t *testing.T) {
 		t.Fatalf("test create t2 err: %s", err.Error())
 	}
 
-	//t21 := Task{
-	//	Name:            tr.Name,
-	//	TkType:          TASKCMD,
-	//	ParentTaskID:    t2.ID,
-	//	SeqNum:          1,
-	//	CollectionValue: strconv.Itoa(50),
-	//	Stages:          string(sg),
-	//	SplitParent:     DoSplit,
-	//	ContinueOnFail:  1,
-	//}
 	t21 := Task{
 		Name:            tr.Name,
 		TkType:          TASKCMD,
@@ -230,17 +231,6 @@ func TestTask_Run(t *testing.T) {
 	if err != nil {
 		t.Fatalf("test create t21 err: %s", err.Error())
 	}
-	//s21 := TaskScript{
-	//	TaskID:  t21.ID,
-	//	Shell:   "/bin/t21sh",
-	//	Name:    "/tmp/test123.sh",
-	//	RunAs:   "jacenr",
-	//	Timeout: 60,
-	//}
-	//err = s21.Create()
-	//if err != nil {
-	//	t.Fatalf("test create s21 err: %s", err.Error())
-	//}
 	c21 := TaskCmd{
 		TaskID: t21.ID,
 		Cmd:    "test21",
@@ -260,6 +250,26 @@ func TestTask_Run(t *testing.T) {
 		CollectionValue: strconv.Itoa(50),
 		Stages:          string(sg),
 		SplitParent:     DoSplit,
+		TaskArgs: []TaskArg{
+			{
+				TaskName: tr.Name,
+				ArgName:  "t22Var1",
+				ArgType:  COMMONSTR,
+				ArgValue: "t22Var1Value",
+			},
+			{
+				TaskName: tr.Name,
+				ArgName:  "t22Var2",
+				ArgType:  AGENTFACT,
+				ArgValue: "t22Var2Value",
+			},
+			{
+				TaskName: tr.Name,
+				ArgName:  "t22Var3",
+				ArgType:  AGENTTAG,
+				ArgValue: "t22Var3Value",
+			},
+		},
 	}
 	err = t22.Create()
 	if err != nil {
@@ -305,22 +315,31 @@ func TestTask_Run(t *testing.T) {
 		Stages:         string(sg), // 100%
 		SplitParent:    DoNotSplit,
 		ContinueOnFail: 1,
+		TaskArgs: []TaskArg{
+			{
+				TaskName: tr.Name,
+				ArgName:  "t31Var1",
+				ArgType:  COMMONSTR,
+				ArgValue: "t31Var1Value",
+			},
+			{
+				TaskName: tr.Name,
+				ArgName:  "t31Var2",
+				ArgType:  AGENTFACT,
+				ArgValue: "t31Var2Value",
+			},
+			{
+				TaskName: tr.Name,
+				ArgName:  "t31Var3",
+				ArgType:  AGENTTAG,
+				ArgValue: "t31Var3Value",
+			},
+		},
 	}
 	err = t31.Create()
 	if err != nil {
 		t.Fatalf("test create t31 err: %s", err.Error())
 	}
-	//s31 := TaskScript{
-	//	TaskID:  t31.ID,
-	//	Shell:   "/bin/zsh",
-	//	Name:    "/tmp/test123.sh",
-	//	RunAs:   "jacenr",
-	//	Timeout: 60,
-	//}
-	//err = s31.Create()
-	//if err != nil {
-	//	t.Fatalf("test create s31 err: %s", err.Error())
-	//}
 	c31 := TaskCmd{
 		TaskID:  t31.ID,
 		Cmd:     "echo31",
@@ -385,9 +404,17 @@ func TestTask_Run(t *testing.T) {
 
 	t.Log("All tasks are created.")
 
+	insName := NewInsName(tr.ID)
 	ins := TaskInstance{
-		Name: NewInsName(tr.ID),
+		Name: insName,
 	}
+
+	argMap := make(map[string]TaskArg)
+	err = tr.InitInsArgs(argMap, insName)
+	if err != nil {
+		t.Fatalf("fail: %s", err)
+	}
+
 	err = tr.Run(&ins)
 	if err != nil {
 		t.Fatalf("test run tr fail: %s", err.Error())

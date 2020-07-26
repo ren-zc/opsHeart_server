@@ -6,6 +6,87 @@ import (
 	"testing"
 )
 
+func TestTask_Create2(t *testing.T) {
+	err := conf.InitCfg()
+	if err != nil {
+		t.Fatalf("init conf err: %s", err.Error())
+	}
+	db.InitDB()
+	db.DB.AutoMigrate(&Task{})
+	db.DB.AutoMigrate(&TaskArg{})
+
+	tk := Task{
+		Name:            "test 02",
+		TkType:          TASKROOT,
+		CollectionType:  CollList,
+		CollectionValue: "[\"A\",\"B\"]",
+		CreateBy:        "jacen",
+		Desc:            "just a test task",
+		TaskArgs: []TaskArg{
+			{
+				TaskName: "test 02",
+				ArgName:  "var1",
+			},
+			{
+				TaskName: "test 02",
+				ArgName:  "var2",
+			},
+		},
+	}
+
+	err = tk.Create()
+	if err != nil {
+		t.Fatalf("fail: %s", err.Error())
+	}
+	t.Log("success!")
+}
+
+func TestTask_GetAllArgsPerTask(t *testing.T) {
+	err := conf.InitCfg()
+	if err != nil {
+		t.Fatalf("init conf err: %s", err.Error())
+	}
+	db.InitDB()
+	db.DB.AutoMigrate(&Task{})
+	db.DB.AutoMigrate(&TaskArg{})
+
+	tk := Task{}
+	tk.ID = 397
+
+	args, err := tk.GetAllTaskArgs()
+	if err != nil {
+		t.Fatalf("fail: %s", err.Error())
+	}
+
+	for _, v := range args {
+		t.Log(v)
+	}
+	t.Log("success!")
+}
+
+func TestTask_GetAllArgsByTaskName(t *testing.T) {
+	err := conf.InitCfg()
+	if err != nil {
+		t.Fatalf("init conf err: %s", err.Error())
+	}
+	db.InitDB()
+	db.DB.AutoMigrate(&Task{})
+	db.DB.AutoMigrate(&TaskArg{})
+
+	tk := Task{
+		Name: "test 02",
+	}
+	args, err := tk.GetAllArgsByTaskName()
+	if err != nil {
+		t.Fatalf("faile: %s", err.Error())
+	}
+
+	for _, v := range args {
+		t.Log(v)
+	}
+	t.Log("success!")
+}
+
 func TestTask_Create(t *testing.T) {
 	err := conf.InitCfg()
 	if err != nil {

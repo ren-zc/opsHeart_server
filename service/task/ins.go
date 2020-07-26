@@ -228,14 +228,17 @@ func (ins *TaskInstance) StartStage(t *Task) {
 
 func (ins *TaskInstance) startBasicTask(tk *Task) {
 	var bt basicTask
+	args, _ := ins.GetAllArgs()
 	switch tk.TkType {
 	case TASKCMD:
 		tc := &TaskCmd{}
 		tc.TaskID = ins.TaskID
+		tc.Args = args
 		bt = tc
 	case TASKSCRIPT:
 		ts := &TaskScript{}
 		ts.TaskID = ins.TaskID
+		ts.Args = args
 		bt = ts
 	case SYNCFILE:
 		tsf := &TaskSyncFile{}
@@ -364,6 +367,7 @@ func (ins *TaskInstance) StageFinish(t *Task) {
 		logger.TaskLog.Debugf("*** ins: %d, next ins: %d\n", ins.ID, nextIns[0].ID)
 
 		// stage not auto start and stage need start by human.
+		// for debug purpose, you can dis-comments it.
 		//nextIns[0].StartStage(t)
 
 		return
