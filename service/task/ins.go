@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"opsHeart_server/common"
 	"opsHeart_server/db"
 	"opsHeart_server/logger"
 	"time"
@@ -366,9 +367,10 @@ func (ins *TaskInstance) StageFinish(t *Task) {
 		}
 		logger.TaskLog.Debugf("*** ins: %d, next ins: %d\n", ins.ID, nextIns[0].ID)
 
-		// stage not auto start and stage need start by human.
-		// for debug purpose, you can dis-comments it.
-		//nextIns[0].StartStage(t)
+		// stage not auto start but step pause is false set by config file.
+		if !common.StepPause {
+			nextIns[0].StartStage(t)
+		}
 
 		return
 	}

@@ -2,6 +2,7 @@ package task
 
 import (
 	"encoding/json"
+	"opsHeart_server/common"
 	"opsHeart_server/conf"
 	"opsHeart_server/db"
 	"opsHeart_server/utils/rand_str"
@@ -111,6 +112,7 @@ func TestTask_Run(t *testing.T) {
 	if err != nil {
 		t.Fatalf("init conf err: %s", err.Error())
 	}
+	common.InitRunningEnv()
 	db.InitDB()
 	db.DB.AutoMigrate(&Task{})
 	db.DB.AutoMigrate(&TaskInstance{})
@@ -135,7 +137,7 @@ func TestTask_Run(t *testing.T) {
 
 	// *** ROOT TASK ***
 	tr := Task{
-		Name:            "test task 89",
+		Name:            "test task 92",
 		TkType:          TASKROOT,
 		CollectionType:  CollList,
 		CollectionValue: string(collValByte),

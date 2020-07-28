@@ -55,3 +55,7 @@ func GetServerRole() bool {
 func GetWorkerConcurrent() int {
 	return cfg.Section("server").Key("worker_concurrent").MustInt()
 }
+
+func GetStepPause() bool {
+	return cfg.Section("server").Key("step_pause").MustInt() == 1
+}

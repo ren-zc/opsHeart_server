@@ -75,7 +75,7 @@ func main() {
 
 	logger.ServerLog.Info("action=load conf file;status=success")
 
-	common.InitAgentPort()
+	common.InitRunningEnv()
 
 	logger.InitLogger()
 
