@@ -52,8 +52,8 @@ const (
 type splitColl uint
 
 const (
-	DoSplit    = 1
-	DoNotSplit = 0
+	DoSplit    splitColl = 1
+	DoNotSplit splitColl = 0
 )
 
 // args type
@@ -87,15 +87,15 @@ type Task struct {
 	CollectionValue string           `json:"collection_value" gorm:"type:MEDIUMTEXT;default:100"`
 	SplitParent     splitColl        `json:"child_split_coll" gorm:"default:0"`
 	StageType       StType           `json:"stage_type" gorm:"default:0"` // default: percent
-	Stages          string           `json:"stages" gorm:"size:500"`
+	Stages          string           `json:"stages" gorm:"size:500;default:'[100]'"`
 	CreateBy        string           `json:"create_by" gorm:"size:50"`
 	Desc            string           `json:"desc" gorm:"size:500"`
 	Status          Status           `json:"status" gorm:"default:1"`
 	Comments        string           `json:"comments" gorm:"size:500"`
 	TaskArgs        []TaskArg        `json:"task_args"`
 	ContinueOnFail  uint             `json:"continue_on_fail" gorm:"default:0"` // 0: no, 1: yes.
-	ParentXGROUP    uint             `gorm:"-"`                                 // 0: no, 1: yes.
 	ParentVGROUP    uint             `gorm:"-"`                                 // 0: no, 1: yes.
+	ParentXGROUP    uint             `gorm:"-"`                                 // 0: no, 1: yes.
 	ChildesNum      int              `gorm:"-"`
 }
 
@@ -134,13 +134,18 @@ type TaskSyncFile struct {
 type StageStatus int
 
 const (
-	STAGEREADY       StageStatus = -1
-	STAGENEEDCONFIRM StageStatus = 0
-	STAGERUNNING     StageStatus = 1
-	STAGEPAUSED      StageStatus = 2
-	STAGESTOPPED     StageStatus = 3
-	STAGEFAILED      StageStatus = 4
-	STAGESUCCESS     StageStatus = 5
+	// start: 0-19
+	STAGEREADY       StageStatus = 0
+	STAGENEEDCONFIRM StageStatus = 1
+
+	// middle: 20-39
+	STAGERUNNING StageStatus = 20
+	STAGEPAUSED  StageStatus = 21
+	STAGESTOPPED StageStatus = 22
+
+	// end: 40-59
+	STAGEFAILED  StageStatus = 40
+	STAGESUCCESS StageStatus = 41
 )
 
 type TaskInstance struct {
@@ -156,13 +161,14 @@ type TaskInstance struct {
 	RunBy           string           `json:"run_by" gorm:"size:50"`
 	Status          StageStatus      `json:"status" gorm:"default:0"`
 	InsMsg          string           `json:"ins_msg" gorm:"size:500"`
+	ParentIsV       uint             `json:"parent_is_v" gorm:"default:0"`      // 0: no, 1: yes.
 	ParentIsX       uint             `json:"parent_is_x" gorm:"default:0"`      // 0: no, 1: yes.
 	ContinueOnFail  uint             `json:"continue_on_fail" gorm:"default:0"` // 0: no, 1: yes.
-	ParentIsV       uint             `json:"parent_is_v" gorm:"default:0"`      // 0: no, 1: yes.
 	BrotherNum      int              `json:"brother_num" gorm:"default:0"`
 	CallbackVGROUP  bool             `gorm:"-"`
 	TaskStageAgents []TaskStageAgent `json:"task_stage_agents" gorm:"foreignkey:stageName;association_foreignkey:stageAgents"`
 	TaskLogs        []TaskLog
+	//ParentIsH       uint             `json:"parent_is_h" gorm:"default:0"`      // 0: no, 1: yes.
 }
 
 type InsArg struct {

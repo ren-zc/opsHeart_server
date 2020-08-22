@@ -56,18 +56,11 @@ func (ins *TaskInstance) GetAllInsIPsByPercentOrNum(p int, t StType, cs splitCol
 }
 
 func (ins *TaskInstance) logFailMsg(status StageStatus, msg string, t *Task) {
-	var callback bool
 	logger.TaskLog.Debugf(">>> ins: %d, update status in log fail: %d\n", ins.ID, status)
-	if ins.ParentIsV == 1 {
-		callback, _ = ins.UpdateAndCheckCallbackVGROUP([]string{"status", "ins_msg", "end_at"},
-			status, msg, time.Now())
-	} else {
-		_ = ins.Update([]string{"status", "ins_msg", "end_at"}, status, msg, time.Now())
-	}
 
-	ins.CallbackVGROUP = callback
-
+	_ = ins.Update([]string{"status", "ins_msg", "end_at"}, status, msg, time.Now())
 	logger.TaskLog.Error(msg)
+
 	ins.Status = status
 
 	if ins.ContinueOnFail == 1 {
@@ -163,6 +156,10 @@ func (ins *TaskInstance) StartStage(t *Task) {
 				return
 			}
 		}
+
+		// start cron
+		VgroupChildChecker(ins, t)
+
 	case XGROUP:
 		// get the previous task result and determine which child task to run
 		rst, err := ins.getPreviousInsRst(t)
@@ -207,7 +204,7 @@ func (ins *TaskInstance) StartStage(t *Task) {
 			err := tSuccess.Run(ins)
 			if err != nil {
 				errMsg := fmt.Sprintf("action=start stage;task_id=%d;task_name=%s;do=run 1st task;ins_id=%d;ins_name=%s;err=%s",
-					tSuccess.ID, tSuccess.Name, ins.ID, ins.Name, ins.Name)
+					tSuccess.ID, tSuccess.Name, ins.ID, ins.Name, err.Error())
 				ins.logFailMsg(STAGEFAILED, errMsg, t)
 			}
 			return
@@ -216,7 +213,7 @@ func (ins *TaskInstance) StartStage(t *Task) {
 			err := tFailed.Run(ins)
 			if err != nil {
 				errMsg := fmt.Sprintf("action=start stage;task_id=%d;task_name=%s;do=run 2nd task;ins_id=%d;ins_name=%s;err=%s",
-					tSuccess.ID, tSuccess.Name, ins.ID, ins.Name, ins.Name)
+					tSuccess.ID, tSuccess.Name, ins.ID, ins.Name, err.Error())
 				ins.logFailMsg(STAGEFAILED, errMsg, t)
 				return
 			}
@@ -313,7 +310,7 @@ func (ins *TaskInstance) getAllStagesOfBrotherTask(t *Task) (ai []TaskInstance, 
 	return ins.GetAllStagesOfTask(tb.ID)
 }
 
-// StageFinish: when start finished, call it
+// StageFinish: when stage finished, it will be called
 func (ins *TaskInstance) StageFinish(t *Task) {
 	childIns, _ := ins.GetAllChildIns()
 
@@ -329,16 +326,10 @@ func (ins *TaskInstance) StageFinish(t *Task) {
 	// save status to db
 	if ins.Status < STAGEFAILED {
 		var err error
-		var callback bool
+		//var callback bool
 		logger.TaskLog.Debugf(">>> ins: %d, update status in finish stage: %d\n",
 			ins.ID, insStatus)
-		if ins.ParentIsV != 1 {
-			err = ins.Update([]string{"status", "end_at"}, insStatus, time.Now())
-		} else {
-			callback, err = ins.UpdateAndCheckCallbackVGROUP([]string{"status", "end_at"},
-				insStatus, time.Now())
-		}
-		ins.CallbackVGROUP = callback
+		err = ins.Update([]string{"status", "end_at"}, insStatus, time.Now())
 		if err != nil {
 			logger.TaskLog.Errorf("action=start stage;do=update success;ins_id=%d;ins_name=%s;err=%s",
 				ins.ID, ins.Name, err.Error())
@@ -351,32 +342,16 @@ func (ins *TaskInstance) StageFinish(t *Task) {
 		return
 	}
 
-	if ins.ParentIsV == 1 && !ins.CallbackVGROUP {
-		logger.TaskLog.Debugf("*** vgroup ins: %d, callback false, return.\n", ins.ID)
-		return
-	}
-
 	// start next stage
-	nextIns, _ := ins.GetNextStageInstance()
-	nextInsL := len(nextIns)
-	if nextInsL == 1 {
-		if nextIns[0].Status >= STAGERUNNING {
-			logger.TaskLog.Debugf("*** ins: %d, next ins: %d, next ins is running, return\n",
-				ins.ID, nextIns[0].ID)
+	if !common.StepPause {
+		runNextIns := ins.RunNextStage(t)
+		if !runNextIns {
 			return
 		}
-		logger.TaskLog.Debugf("*** ins: %d, next ins: %d\n", ins.ID, nextIns[0].ID)
-
-		// stage not auto start but step pause is false set by config file.
-		if !common.StepPause {
-			nextIns[0].StartStage(t)
-		}
-
-		return
 	}
-	if nextInsL > 1 {
-		logger.TaskLog.Errorf("action=stage finish;ins_id=%d;ins_name=%s;err=there are %d stage for seq %d",
-			ins.ID, ins.Name, nextInsL, ins.StageSeq+1)
+
+	// if task in a vgroup task, return
+	if ins.ParentIsV == 1 {
 		return
 	}
 
@@ -390,36 +365,68 @@ func (ins *TaskInstance) StageFinish(t *Task) {
 	// if no next stage, call next task
 	parentIns, _ := GetInstanceByID(ins.ParentInsID)
 
-	if ins.ParentIsX != 1 {
-		nextTk, _ := t.GetNextTask()
-		nextTkL := len(nextTk)
-		if nextTkL == 1 {
-			logger.TaskLog.Debugf("*** ins: %d, next task: %d\n", ins.ID, nextTk[0].ID)
-			err := nextTk[0].Run(&parentIns)
-			if err != nil {
-				logger.TaskLog.Errorf("action=stage finish;do=start task;task_id=%d;task_name=%s;ins_id=%d;ins_name=%s;err=%s;",
-					nextTk[0].ID, nextTk[0].Name, ins.ID, ins.Name, err.Error())
-				return
-			}
-			return
-		}
-		if nextTkL > 1 {
-			logger.TaskLog.Errorf("action=stage finish;do=start task;ins_id=%d;ins_name=%s;err=more task found",
-				ins.ID, ins.Name)
-			return
-		}
+	// if parent instance is a xgroup task, it can only call finish to callback parent
+	//if ins.ParentIsX != 1 {
+	//}
+	continueOn := ins.RunNextTask(t, &parentIns)
+	if !continueOn {
+		return
 	}
 
 	logger.TaskLog.Debugf("*** ins: %d, callback parent 1: %d\n", ins.ID, parentIns.ID)
-
-	if parentIns.ID == 0 {
-		return
-	}
 
 	// call parent instance stage finish
 	parentTk, _ := GetTaskByID(parentIns.TaskID)
 	parentIns.StageFinish(&parentTk)
 	return
+}
+
+func (ins *TaskInstance) RunNextTask(t *Task, parentIns *TaskInstance) (continueOn bool) {
+	nextTk, _ := t.GetNextTask()
+	nextTkL := len(nextTk)
+	if nextTkL == 1 {
+		logger.TaskLog.Debugf("*** ins: %d, next task: %d\n", ins.ID, nextTk[0].ID)
+		err := nextTk[0].Run(parentIns)
+		if err != nil {
+			logger.TaskLog.Errorf("action=stage finish;do=start task;task_id=%d;task_name=%s;ins_id=%d;ins_name=%s;err=%s;",
+				nextTk[0].ID, nextTk[0].Name, ins.ID, ins.Name, err.Error())
+			return false
+		}
+		return false
+	}
+	if nextTkL > 1 {
+		logger.TaskLog.Errorf("action=stage finish;do=start task;ins_id=%d;ins_name=%s;err=more task found",
+			ins.ID, ins.Name)
+		return false
+	}
+	return true
+}
+
+func (ins *TaskInstance) RunNextStage(t *Task) (nextTask bool) {
+	nextIns, _ := ins.GetNextStageInstance()
+	nextInsL := len(nextIns)
+	fmt.Printf("next ins length: %d\n", nextInsL)
+	if nextInsL == 1 {
+		if nextIns[0].Status >= STAGERUNNING {
+			logger.TaskLog.Debugf("*** ins: %d, next ins: %d, next ins is running, return\n",
+				ins.ID, nextIns[0].ID)
+			return
+		}
+		logger.TaskLog.Debugf("*** ins: %d, next ins: %d\n", ins.ID, nextIns[0].ID)
+
+		// stage not auto start but step pause is false set by config file.
+		nextIns[0].StartStage(t)
+		logger.TaskLog.Infof("action=run next stage;task_name=%s;task_id=%d;ins=%d;next_ins=%d",
+			t.Name, t.ID, ins.ID, nextIns[0].ID)
+
+		return false
+	}
+	if nextInsL > 1 {
+		logger.TaskLog.Errorf("action=stage finish;ins_id=%d;ins_name=%s;err=there are %d stage for seq %d",
+			ins.ID, ins.Name, nextInsL, ins.StageSeq+1)
+		return false
+	}
+	return true
 }
 
 func (ins *TaskInstance) CallbackParentStage() {

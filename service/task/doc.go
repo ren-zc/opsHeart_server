@@ -11,8 +11,7 @@ package task
 // Type XGROUP: only contain two tasks, they are exclusion,
 //     in XGROUP: the firs child will run when condition is success,
 //     the second child will run when condition is failed.
-// That is to say only one task to be called in this group;
-// The call of two task depend on the result of the task specified by `continue_by_task`.
+//     That is to say only one task to be called in this group;
 
 // Only ROOT need approved, and it is a task entrance;
 // ROOT, H_GROUP and V_GROUP has more than one child;
@@ -40,6 +39,7 @@ package task
 // If blank, will not split.
 
 // `continue_by_task`: check the specific task before start;
+//     the task must be a brother task
 // `continue_by_rst`: the rst of the task of `continue_by_task`
 //     default: success
 // if continue check failed, the task will be set to failed, and all tasks of later won't be running,

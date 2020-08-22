@@ -16,7 +16,7 @@ func printFunc() {
 	fmt.Printf("this func no argments.\n")
 }
 
-// test cron use
+// test cron usage with arguments
 func TestCr_Start1(t *testing.T) {
 	argsList := []interface{}{int64(2), "a"}
 	c, err := NewCron(printNS, argsList, 3*time.Second, 1)

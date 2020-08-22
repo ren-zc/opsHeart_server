@@ -10,6 +10,10 @@ opsHeart ChangeLog
 + REMOVED
 + OTHERS
 
+## v0.05 (2020-08-22)
+### CHANGED
++ refactor vgroup concurrent handle method;
+
 ## v0.04 (2020-07-26)
 ### FEATURES
 + User can supply variables to basic task;

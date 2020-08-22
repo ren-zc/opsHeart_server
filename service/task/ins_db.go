@@ -92,6 +92,13 @@ func (ins *TaskInstance) GetAllChildIns() (all []TaskInstance, err error) {
 	return
 }
 
+func (ins *TaskInstance) GetAllChildInsWithUnfinished() (all []TaskInstance, err error) {
+	err = db.DB.Model(ins).Where("parent_ins_id = ?", ins.ID).
+		Where("status < ?", STAGEFAILED).
+		Find(&all).Error
+	return
+}
+
 func (ins *TaskInstance) GetAllArgs() (args []InsArg, err error) {
 	err = db.DB.Model(&InsArg{}).Where("ins_name = ? and task_id = ?", ins.Name, ins.TaskID).
 		Find(&args).Error
